@@ -85,12 +85,7 @@ function App() {
 
   // download markdown to txt
   const download = () => {
-    const content = snippetContent;
-
-    // if it has no content
-    if (!content.trim()) {
-      return;
-    };
+    const content = id ? snippetContent : markDown;
 
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
