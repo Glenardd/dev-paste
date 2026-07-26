@@ -1,0 +1,35 @@
+# ----------------------------
+# Node.js / Frontend
+# ----------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Environment variables
+frontend/.env
+backend/.env
+
+# ----------------------------
+# Python / Backend
+# ----------------------------
+backend/venv/
+backend/__pycache__/
+backend/*.py[cod]
+backend/.pytest_cache/
+backend/.mypy_cache/
+
+# ----------------------------
+# IDE
+# ----------------------------
+.vscode/
+
+# ----------------------------
+# OS files
+# ----------------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# Logs
+# ----------------------------
+*.log
