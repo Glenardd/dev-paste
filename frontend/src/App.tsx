@@ -47,7 +47,7 @@ function App() {
         };
 
         // service not available
-        if (error.response?.status === 404){
+        if (error.response?.status === 404) {
           notification_api.error({
             title: "Service unavailable",
             description: "The application couldn't reach the requested service.",
@@ -96,6 +96,17 @@ function App() {
   // download markdown to txt
   const download = () => {
     const content = id ? snippetContent : markDown;
+
+    if (!content.trim()) {
+      notification_api.error({
+        title: "No markdown found",
+        description: "please atleast input a markdown",
+        duration: 2,
+        showProgress: true
+      });
+
+      return;
+    };
 
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
