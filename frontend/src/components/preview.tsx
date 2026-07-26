@@ -9,7 +9,7 @@ function Preview({ markdown }: { markdown: string | null }) {
         </Markdown>
     ) : (
         <Flex justify="center" align="center" style={{ height: "100%", color: `${markdown!.trim() !== "" ? "black" : "gray"}` }}>
-            <h1>Markdown not found</h1>
+            <h1>No Markdown</h1>
         </Flex>
     )
 
