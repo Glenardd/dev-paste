@@ -3,7 +3,7 @@ import TextEditor from "./components/TextEditor";
 import Preview from "./components/preview";
 import { Button } from "antd";
 import { notification } from 'antd';
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { api } from "./api/api";
@@ -179,7 +179,9 @@ function App() {
           <Button type="primary" size={"large"} onClick={() => download()} >Download</Button>
         </div>
         <div className="buttons">
-          <GithubFilled style={{ color: "#1677ff", fontSize: '32px' }} />
+          <Link to="https://github.com/Glenardd/dev-paste">
+            <GithubFilled style={{ color: "#1677ff", fontSize: '32px' }} />
+          </Link>
         </div>
       </div>
     </div>
