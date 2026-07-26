@@ -34,8 +34,6 @@ function App() {
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.code);
-
         // rate limit error
         if (error.response?.status === 429) {
           notification_api.error({
@@ -47,6 +45,18 @@ function App() {
 
           return;
         };
+
+        // service not available
+        if (error.response?.status === 404){
+          notification_api.error({
+            title: "Service unavailable",
+            description: "The application couldn't reach the requested service.",
+            duration: 2,
+            showProgress: true
+          });
+
+          return;
+        }
 
         //checks if api is offline
         if (error.code === "ERR_NETWORK") {
@@ -111,7 +121,6 @@ function App() {
         setSnippeContent(response.data!.content)
       } catch (error) {
         if (axios.isAxiosError(error)) {
-
           if (error.response?.status === 404) {
             notification_api.error({
               title: "No markdown found",
