@@ -25,7 +25,7 @@ function App() {
         content: `${markDown}`
       };
 
-      const response = await api.post("/v1/snippets", payload);
+      const response = await api.post("api/v1/snippets", payload);
       const generatedId = response.data.id;
 
       // copies the id of the 
@@ -128,7 +128,7 @@ function App() {
     const fetchMarkUp = async () => {
 
       try {
-        const response = await api.get(`/v1/snippets/${id}`);
+        const response = await api.get(`/api/v1/snippets/${id}`);
         setSnippeContent(response.data!.content)
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -166,7 +166,7 @@ function App() {
     // updates the markdon content in db
     const updateMarkdown = async () => {
       try {
-        const response = await api.get('v1/snippets/all');
+        const response = await api.get('api/v1/snippets/all');
         if(response.status ===200){
           console.log("markdown updated successfully");
         };
