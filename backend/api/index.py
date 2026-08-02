@@ -72,8 +72,9 @@ class SnippetRequest(BaseModel):
 @limiter.limit(RATE_LIMIT)
 def check_status(request: Request):
     return {
-        "status":"ok"
-    }
+        "status": "ok", 
+        "message": "API is running!"
+        }
 
 @app.post("/api/v1/snippets", status_code=201)
 @limiter.limit(RATE_LIMIT)
