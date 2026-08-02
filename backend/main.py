@@ -68,14 +68,14 @@ class SnippetRequest(BaseModel):
     content: str
 
 #  for status check of the api
-@app.get("/", status_code=200)
+@app.get("/api", status_code=200)
 @limiter.limit(RATE_LIMIT)
 def check_status(request: Request):
     return {
         "status":"ok"
     }
 
-@app.post("/v1/snippets", status_code=201)
+@app.post("api/v1/snippets", status_code=201)
 @limiter.limit(RATE_LIMIT)
 def read_snippets(request: Request ,payload: SnippetRequest, api_security: str = Depends(verify_api_key)):
     # combine alphabet and numbers
@@ -99,7 +99,7 @@ def read_snippets(request: Request ,payload: SnippetRequest, api_security: str =
         }
 
 # to view all active snippets in db
-@app.get("/v1/snippets/all", status_code=200)
+@app.get("api/v1/snippets/all", status_code=200)
 @limiter.limit(RATE_LIMIT)
 def get_snippets_all(request: Request, api_security: str = Depends(verify_api_key)):
     docs_list = docs.stream()
@@ -121,7 +121,7 @@ def get_snippets_all(request: Request, api_security: str = Depends(verify_api_ke
 
     return snippets
 
-@app.get("/v1/snippets/{id}", status_code=200)
+@app.get("api/v1/snippets/{id}", status_code=200)
 @limiter.limit(RATE_LIMIT)
 def read_root(request: Request,id: str, api_security: str = Depends(verify_api_key)):
     
@@ -143,7 +143,7 @@ def read_root(request: Request,id: str, api_security: str = Depends(verify_api_k
         }
 
 # to show api configuration
-@app.get("/v1/config", status_code=200)
+@app.get("api/v1/config", status_code=200)
 @limiter.limit(RATE_LIMIT)
 def get_config(request: Request, api_security: str = Depends(verify_api_key)):
     return {
