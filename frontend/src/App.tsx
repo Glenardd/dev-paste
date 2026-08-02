@@ -163,6 +163,20 @@ function App() {
       };
     };
 
+    // updates the markdon content in db
+    const updateMarkdown = async () => {
+      try {
+        const response = await api.get('v1/snippets/all');
+        if(response.status ===200){
+          console.log("markdown updated successfully");
+        };
+
+      } catch (error) {
+        return;
+      }
+    }
+
+    updateMarkdown();
     fetchMarkUp();
   }, [id]);
 

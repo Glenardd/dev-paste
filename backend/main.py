@@ -4,12 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 import string
 import random
 from pydantic import BaseModel
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import os
+from firebase_config import db_firestore # database
 
 # load env
 load_dotenv()
@@ -59,8 +60,8 @@ app.add_middleware(
     allow_credentials=True,
 )
 
-# In memory storage for the json data
-db = {}
+ # get db collection
+docs = db_firestore.collection("snippets")
 
 # parses incoming POST request 
 class SnippetRequest(BaseModel):
@@ -68,22 +69,19 @@ class SnippetRequest(BaseModel):
 
 @app.post("/v1/snippets", status_code=201)
 @limiter.limit(RATE_LIMIT)
-def read_snippets(request: Request ,payload: SnippetRequest, _: str = Depends(verify_api_key)):
+def read_snippets(request: Request ,payload: SnippetRequest, api_security: str = Depends(verify_api_key)):
     # combine alphabet and numbers
     id_generate = string.ascii_letters + string.digits
     # randomize sequence of numbers and string in a length of 0-6
     id_generate = ''.join(random.choice(id_generate) for _ in range(0,6))
 
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     expiration_time = now + timedelta(hours=EXPIRATION_HOURS)
     
-    # stores the markdown content
-    db[id_generate] = {
+    docs.document(id_generate).set({
         "content": payload.content,
-        "expires_at": expiration_time,
-    }
-    
-    print(db)
+        "expiration_at": expiration_time
+    })
     
     # post payload
     return {
@@ -92,25 +90,56 @@ def read_snippets(request: Request ,payload: SnippetRequest, _: str = Depends(ve
         "expires_at": f"{expiration_time}"
         }
 
-@app.get("/v1/snippets/{id}")
+# to view all active snippets in db
+@app.get("/v1/snippets/all", status_code=200)
 @limiter.limit(RATE_LIMIT)
-def read_root(request: Request,id: str, _: str = Depends(verify_api_key)):
-    if id not in db:
+def get_snippets_all(request: Request, api_security: str = Depends(verify_api_key)):
+    docs_list = docs.stream()
+
+    snippets = []
+
+    now = datetime.now(timezone.utc)
+    
+    for doc in docs_list:
+        
+        if now > doc.to_dict()['expiration_at']:
+            doc.reference.delete()
+            
+        snippets.append({
+            "id": doc.id,
+            "content": doc.to_dict()["content"],
+            "expiration_at": doc.to_dict()["expiration_at"]
+        })
+
+    return snippets
+
+@app.get("/v1/snippets/{id}", status_code=200)
+@limiter.limit(RATE_LIMIT)
+def read_root(request: Request,id: str, api_security: str = Depends(verify_api_key)):
+    
+    found_snippet = docs.document(id).get()
+    
+    # error if snippet not found
+    if not found_snippet.exists:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Snippet not found")
     
-    #  check id
-    snippet = db[id]
-    # check if expiration time met
-    if datetime.now() > snippet['expires_at']:
-        del db[id]
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Snippet has expired")
+    # expiration check for the snippet
+    now = datetime.now(timezone.utc)
+    if now > found_snippet.to_dict()['expiration_at']:
+        found_snippet.reference.delete()
     
-    return {"id": f"{id}","content": f"{snippet['content']}"}
+    return {
+        "id": f"{found_snippet.id}", 
+        "content": f"{found_snippet.to_dict()['content']}",
+        "expration_at": f"{found_snippet.to_dict()['expiration_at']}"
+        }
 
 # to show api configuration
-@app.get("/v1/config")
-def get_config():
+@app.get("/v1/config", status_code=200)
+@limiter.limit(RATE_LIMIT)
+def get_config(request: Request, api_security: str = Depends(verify_api_key)):
     return {
         "environment": ENVIRONMENT,
-        "snippet_ttl_seconds": EXPIRATION_HOURS
+        "snippet_ttl_hours": EXPIRATION_HOURS
     }
+        
