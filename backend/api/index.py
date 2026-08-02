@@ -10,17 +10,17 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import os
-from .firebase_config_v1 import db_firestore # database connection
+from firebase_config_v1 import db_firestore # database connection
 
 # load env
 load_dotenv()
 
 # env variables
-ENVIRONMENT = os.getenv("ENVIRONMENT")
-EXPIRATION_HOURS = int(os.getenv("SNIPPET_EXPIRATION_HOURS"))
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
-RATE_LIMIT = os.getenv("POST_RATE_LIMIT")
-API_KEY = os.getenv("API_KEY")
+ENVIRONMENT = os.getenv("ENVIRONMENT", 'development')
+EXPIRATION_HOURS = int(os.getenv("SNIPPET_EXPIRATION_HOURS", "2"))
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
+RATE_LIMIT = os.getenv("POST_RATE_LIMIT", "5/minute") # default 5 requests per minute
+API_KEY = os.getenv("API_KEY", "")
 
 # split the allowed origins
 origins = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
