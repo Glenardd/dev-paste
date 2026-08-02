@@ -25,12 +25,10 @@ function App() {
         content: `${markDown}`
       };
 
-      const response = await api.post("api/v1/snippets", payload);
+      const response = await api.post("/api/v1/snippets", payload);
       const generatedId = response.data.id;
 
-      // copies the id of the 
-      console.log(generatedId);
-      await navigator.clipboard.writeText(generatedId);
+      await navigator.clipboard.writeText(`https://dev-paste.vercel.app/snippet/${generatedId}`);
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
