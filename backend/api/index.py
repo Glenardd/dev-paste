@@ -10,7 +10,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import os
-from backend.api.firebase_config import db_firestore
+from firebase_config import db_firestore
 
 # load env
 load_dotenv()
