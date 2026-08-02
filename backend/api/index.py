@@ -68,7 +68,7 @@ class SnippetRequest(BaseModel):
     content: str
 
 #  for status check of the api
-@app.get("/api", status_code=200)
+@app.get("/", status_code=200)
 @limiter.limit(RATE_LIMIT)
 def check_status(request: Request):
     return {
