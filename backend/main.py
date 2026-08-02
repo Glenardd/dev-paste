@@ -1,3 +1,5 @@
+print(">>> main.py loaded")
+
 from fastapi import FastAPI, HTTPException, Request, Depends, Security, status
 from fastapi.security import APIKeyHeader
 from fastapi.middleware.cors import CORSMiddleware
