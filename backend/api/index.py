@@ -10,7 +10,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import os
-from firebase_config import db_firestore
+from .firebase_config import db_firestore
 
 # load env
 load_dotenv()
@@ -70,7 +70,7 @@ class SnippetRequest(BaseModel):
 #  for status check of the api
 @app.get("/", status_code=200)
 @limiter.limit(RATE_LIMIT)
-def check_status(request: Request):
+def check_api_status(request: Request):
     return {
         "status": "ok", 
         "message": "API is running!"
@@ -78,7 +78,7 @@ def check_status(request: Request):
 
 @app.post("/api/v1/snippets", status_code=201)
 @limiter.limit(RATE_LIMIT)
-def read_snippets(request: Request ,payload: SnippetRequest, api_security: str = Depends(verify_api_key)):
+def add_snippets(request: Request ,payload: SnippetRequest, api_security: str = Depends(verify_api_key)):
     # combine alphabet and numbers
     id_generate = string.ascii_letters + string.digits
     # randomize sequence of numbers and string in a length of 0-6
@@ -102,7 +102,7 @@ def read_snippets(request: Request ,payload: SnippetRequest, api_security: str =
 # to view all active snippets in db
 @app.get("/api/v1/snippets/all", status_code=200)
 @limiter.limit(RATE_LIMIT)
-def get_snippets_all(request: Request, api_security: str = Depends(verify_api_key)):
+def get_snippets_list(request: Request, api_security: str = Depends(verify_api_key)):
     docs_list = docs.stream()
 
     snippets = []
@@ -124,7 +124,7 @@ def get_snippets_all(request: Request, api_security: str = Depends(verify_api_ke
 
 @app.get("/api/v1/snippets/{id}", status_code=200)
 @limiter.limit(RATE_LIMIT)
-def read_root(request: Request,id: str, api_security: str = Depends(verify_api_key)):
+def get_snippet_id(request: Request,id: str, api_security: str = Depends(verify_api_key)):
     
     found_snippet = docs.document(id).get()
     
@@ -146,7 +146,7 @@ def read_root(request: Request,id: str, api_security: str = Depends(verify_api_k
 # to show api configuration
 @app.get("/api/v1/config", status_code=200)
 @limiter.limit(RATE_LIMIT)
-def get_config(request: Request, api_security: str = Depends(verify_api_key)):
+def get_api_config(request: Request, api_security: str = Depends(verify_api_key)):
     return {
         "environment": ENVIRONMENT,
         "snippet_ttl_hours": EXPIRATION_HOURS
