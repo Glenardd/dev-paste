@@ -67,6 +67,14 @@ docs = db_firestore.collection("snippets")
 class SnippetRequest(BaseModel):
     content: str
 
+#  for status check of the api
+@app.get("/", status_code=200)
+@limiter.limit(RATE_LIMIT)
+def check_status(request: Request):
+    return {
+        "status":"ok"
+    }
+
 @app.post("/v1/snippets", status_code=201)
 @limiter.limit(RATE_LIMIT)
 def read_snippets(request: Request ,payload: SnippetRequest, api_security: str = Depends(verify_api_key)):
@@ -142,4 +150,3 @@ def get_config(request: Request, api_security: str = Depends(verify_api_key)):
         "environment": ENVIRONMENT,
         "snippet_ttl_hours": EXPIRATION_HOURS
     }
-        
